@@ -70,7 +70,7 @@ const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
         name="play-circle-outline"
         size={26}
         color="#f8c100"
-        onPress={() => playthisSong(track)}
+        onPress={() => playthisSong(track, index)}
       />
       <View style={styles.titleSection}>
         <Text style={styles.title}>{CleanName(track.filename)}</Text>

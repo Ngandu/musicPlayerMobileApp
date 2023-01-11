@@ -1,6 +1,7 @@
 import * as MediaLibrary from "expo-media-library";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const getMediaFiles = async () => {
+export async function getMediaFiles() {
   // get the Audio files in the phone
   async function getAudioFile() {
     let media = await MediaLibrary.getAssetsAsync({
@@ -46,6 +47,29 @@ const getMediaFiles = async () => {
   }
 
   console.log(permision);
-};
+}
 
-export default getMediaFiles;
+export async function storeData(type, data, name) {
+  if (type == "post") {
+    try {
+      const jsonValue = JSON.stringify(data);
+      await AsyncStorage.setItem(name, jsonValue);
+      return true;
+    } catch (e) {
+      // saving error
+      console.warn(e);
+      return false;
+    }
+  }
+
+  if (type == "get") {
+    try {
+      const jsonValue = await AsyncStorage.getItem(name);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+      console.warn(e);
+      return false;
+    }
+  }
+}

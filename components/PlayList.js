@@ -6,9 +6,12 @@ import {
   Dimensions,
   ScrollView,
   Pressable,
+  TextInput,
+  KeyboardAvoidingView,
 } from "react-native";
 const { width, height } = Dimensions.get("screen");
 import Ionicons from "@expo/vector-icons/Ionicons";
+import PlayerButton from "./PlayerButton";
 
 const PlayList = ({ closeList }) => {
   const styles = StyleSheet.create({
@@ -22,6 +25,8 @@ const PlayList = ({ closeList }) => {
       zIndex: 2,
     },
     inner: {
+      flex: 1,
+      flexDirection: "row",
       width: width - 20,
       marginLeft: 10,
       marginRight: 20,
@@ -64,7 +69,7 @@ const PlayList = ({ closeList }) => {
       <Pressable style={styles.close} onPress={() => closeList()}>
         <Ionicons name="close-outline" size={50} color="#ffffff" />
       </Pressable>
-      <ScrollView style={styles.inner}>
+      <ScrollView style={styles.inner} keyboardDismissMode={true}>
         <View style={styles.plistcon}>
           <Ionicons name="list-outline" size={20} color="#000000" />
           <Text style={styles.title}>Title of playlist</Text>
