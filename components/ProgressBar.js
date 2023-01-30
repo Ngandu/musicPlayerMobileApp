@@ -38,7 +38,7 @@ const ProgressBar = ({ duration, trackId, Playing }) => {
       // This block will be executed 100 times.
       countInterval = setInterval(function () {
         if (i == 200 || i > 200) clearInterval(this);
-        else console.log("Currently at " + i++);
+        // else console.log("Currently at " + i++);
       }, 1000);
     }
 

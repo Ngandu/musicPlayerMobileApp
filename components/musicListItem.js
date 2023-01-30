@@ -1,10 +1,26 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
 const { width, height } = Dimensions.get("screen");
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CleanName from "../sdk/CleanName";
 
-const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
+const MusicListItem = ({
+  track,
+  index,
+  addHeart,
+  playthisSong,
+  currentTrackIndex,
+}) => {
+  const [IsPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (currentTrackIndex == index) {
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false);
+    }
+  }, [currentTrackIndex]);
+
   const styles = StyleSheet.create({
     container: {
       width: width - 10,
@@ -12,10 +28,11 @@ const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
       borderWidth: 1,
       borderColor: "#444444",
       borderRadius: 5,
-      padding: 10,
+      padding: 15,
       flex: 1,
       flexDirection: "row",
       marginBottom: 20,
+      backgroundColor: IsPlaying ? "#f8c100" : null,
     },
     titleSection: {
       flex: 7,
@@ -65,13 +82,16 @@ const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Ionicons
-        name="play-circle-outline"
-        size={26}
-        color="#f8c100"
-        onPress={() => playthisSong(track, index)}
-      />
+    <Pressable
+      style={styles.container}
+      onPress={() => playthisSong(track, index)}
+    >
+      {IsPlaying ? (
+        <Ionicons name="pause-circle-outline" size={26} color="#444444" />
+      ) : (
+        <Ionicons name="play-circle-outline" size={26} color="#f8c100" />
+      )}
+
       <View style={styles.titleSection}>
         <Text style={styles.title}>{CleanName(track.filename)}</Text>
         <Text style={styles.duration}>{timeset(track.duration)}</Text>
@@ -80,7 +100,7 @@ const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
         <Ionicons
           name="heart"
           size={26}
-          color="#f8c100"
+          color={IsPlaying ? "#444444" : "#f8c100"}
           style={styles.heart}
           onPress={() => heartPressed(index)}
         />
@@ -88,12 +108,12 @@ const MusicListItem = ({ track, index, addHeart, playthisSong }) => {
         <Ionicons
           name="heart-outline"
           size={26}
-          color="#f8c100"
+          color={IsPlaying ? "#444444" : "#f8c100"}
           style={styles.heart}
           onPress={() => heartPressed(index)}
         />
       )}
-    </View>
+    </Pressable>
   );
 };
 

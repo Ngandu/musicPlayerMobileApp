@@ -71,6 +71,7 @@ const Home = () => {
         setSound(sound);
 
         // console.log("Playing Sound");
+        sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
         await sound.playAsync();
         setCurrentTrackId(audio.id);
         setCurrentTrackTitle(audio.filename);
@@ -131,6 +132,19 @@ const Home = () => {
       playSound(Songs[0], 0);
     }
   };
+
+  // Keep progress of the track
+  // When track has ended @didJustFinish will be true then go to next track
+  function onPlaybackStatusUpdate({ uri, didJustFinish }) {
+    console.log("onPlaybackStatusUpdate: ", uri, didJustFinish);
+    // // Normal updates don't interest us.
+    if (!didJustFinish) {
+      return;
+    }
+
+    // reloadSoundForKey(key);
+    nextButtonPressed();
+  }
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -280,6 +294,7 @@ const Home = () => {
                 index={i}
                 addHeart={addHeart}
                 playthisSong={playSound}
+                currentTrackIndex={currentTrackIndex}
               />
             );
           })}
