@@ -35,11 +35,11 @@ const Home = () => {
   const [songProgress, setSongProgress] = useState(0);
   const [songPosition, setSongPosition] = useState(0);
   const [searchText, setSearchText] = useState("");
-  const [Songsdata, setSongsData] = useState([]);
 
   const sound = React.useRef(new Audio.Sound());
 
   async function playSound(audio, i) {
+    console.log(audio);
     if (Sound === null) {
       const { sound, status } = await Audio.Sound.createAsync({
         uri: audio.uri,
@@ -104,7 +104,7 @@ const Home = () => {
   // Next song play
   const nextButtonPressed = async () => {
     // console.log("currentTrackIndex: ", currentTrackIndex);
-    if (currentTrackIndex > 0 && !currentTrackIndex > Songs.length - 1) {
+    if (currentTrackIndex >= 0 && currentTrackIndex < Songs.length - 1) {
       let nextIndex = currentTrackIndex + 1;
       // console.log("nextIndex: ", nextIndex);
       let nextSong = Songs[nextIndex];
@@ -130,13 +130,14 @@ const Home = () => {
       setCurrentTrackIndex(nextIndex);
       playSound(nextSong, nextIndex);
     } else {
-      // if a song is currently plying, this means the first song is playing
-      if (play) {
-        playSound(Songs[1], 1);
-        return;
-      }
-      // if Playing is not on then the first song on the array should play
-      playSound(Songs[0], 0);
+      // // if a song is currently plying, this means the first song is playing
+      // if (play) {
+      //   playSound(Songs[0], 0);
+      //   return;
+      // }
+      // // if Playing is not on then the first song on the array should play
+      // playSound(Songs[0], 0);
+      return;
     }
   };
 
@@ -371,7 +372,7 @@ const Home = () => {
                 index={i}
                 addHeart={addHeart}
                 playthisSong={playSound}
-                currentTrackIndex={currentTrackIndex}
+                currentTrackId={currentTrackId}
               />
             );
           })

@@ -9,17 +9,17 @@ const MusicListItem = ({
   index,
   addHeart,
   playthisSong,
-  currentTrackIndex,
+  currentTrackId,
 }) => {
   const [IsPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (currentTrackIndex == index) {
+    if (currentTrackId == track.id) {
       setIsPlaying(true);
     } else {
       setIsPlaying(false);
     }
-  }, [currentTrackIndex]);
+  }, [currentTrackId]);
 
   const styles = StyleSheet.create({
     container: {
