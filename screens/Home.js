@@ -6,16 +6,17 @@ import {
   ImageBackground,
   View,
   Text,
-  Pressable,
+  TouchableOpacity,
   StatusBar,
   TouchableHighlight,
+  TextInput,
 } from "react-native";
 const { width, height } = Dimensions.get("screen");
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Audio } from "expo-av";
 import { getMediaFiles, storeData } from "../sdk";
 import CleanName from "../sdk/CleanName";
-import TimeConvert from "../sdk/TimeConvert";
+import { TimeConvert, TimeConvertMil } from "../sdk/TimeConvert";
 
 import MusicListItem from "../components/musicListItem";
 import ProgressBar from "../components/ProgressBar";
@@ -31,6 +32,10 @@ const Home = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0); // Tracks the index of current song in the list
   const [lovedSongs, setLovedSongs] = useState([]);
   const [play, setPlay] = useState(false);
+  const [songProgress, setSongProgress] = useState(0);
+  const [songPosition, setSongPosition] = useState(0);
+  const [searchText, setSearchText] = useState("");
+  const [Songsdata, setSongsData] = useState([]);
 
   const sound = React.useRef(new Audio.Sound());
 
@@ -85,11 +90,13 @@ const Home = () => {
   // Controllers
   const playButtonPressed = async () => {
     // Check if there is a song loaded
+    console.log(play);
     if (play) {
       Sound.pauseAsync();
       setPlay(false);
     } else {
-      await Sound.playAsync();
+      // await Sound.playAsync();
+      playSound(Songs[0], 0);
       setPlay(true);
     }
   };
@@ -135,10 +142,22 @@ const Home = () => {
 
   // Keep progress of the track
   // When track has ended @didJustFinish will be true then go to next track
-  function onPlaybackStatusUpdate({ uri, didJustFinish }) {
-    console.log("onPlaybackStatusUpdate: ", uri, didJustFinish);
+  function onPlaybackStatusUpdate({
+    uri,
+    didJustFinish,
+    positionMillis,
+    durationMillis,
+  }) {
+    // console.log("onPlaybackStatusUpdate: ", uri, didJustFinish);
+    // console.log(positionMillis, durationMillis);
+
     // // Normal updates don't interest us.
     if (!didJustFinish) {
+      let temp = (durationMillis - positionMillis) / durationMillis;
+      let temp2 = parseInt(temp * 100);
+
+      setSongPosition(positionMillis);
+      setSongProgress(100 - temp2);
       return;
     }
 
@@ -150,9 +169,30 @@ const Home = () => {
       flex: 1,
       backgroundColor: "#181818",
     },
-    topImage: {
+    // topImage: {
+    //   width: width,
+    //   height: height / 3,
+    // },
+    searchContainer: {
+      marginTop: 30,
       width: width,
-      height: height / 3,
+      height: 70,
+      padding: 10,
+      flexDirection: "row",
+    },
+    searchInput: {
+      borderBottomWidth: 0.5,
+      borderColor: "#dddddd",
+      color: "#eeeeee",
+      placeholderTextColor: "#dddddd",
+      flex: 0.8,
+      padding: 10,
+    },
+    searchButton: {
+      backgroundColor: "#f8c100",
+      flex: 0.2,
+      alignItems: "center",
+      justifyContent: "center",
     },
     details: {
       borderLeftColor: "#f8c100",
@@ -187,6 +227,13 @@ const Home = () => {
       flex: 0.5,
       padding: 20,
       alignItems: "center",
+    },
+    noSong: {
+      color: "#ffffff",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginTop: 100,
+      fontSize: 25,
     },
   });
 
@@ -241,14 +288,23 @@ const Home = () => {
     loadAidio();
   }, []);
 
-  const filterData = async (type) => {
-    if (type == "heart") {
-      let temp = Songs.filter((song) => (song.heart == true ? song : null));
-      setFilteredSongs(temp);
-    }
+  const filterData = async (type, search = false) => {
+    if (search) {
+      // filter by song title
+      const newData = Songs.filter((item) => item.filename.includes(type));
+      setFilteredSongs(newData);
+      return;
+    } else {
+      if (type == "heart") {
+        let temp = Songs.filter((song) => (song.heart == true ? song : null));
+        setFilteredSongs(temp);
+        return;
+      }
 
-    if (type == "all") {
-      setFilteredSongs(Songs);
+      if (type == "all") {
+        setFilteredSongs(Songs);
+        return;
+      }
     }
   };
 
@@ -265,15 +321,35 @@ const Home = () => {
       console.log("saved loved songs");
     }
   };
+
+  const searchForSong = () => {
+    // filter by search
+    filterData(searchText, true);
+  };
   return (
     <View style={styles.container}>
-      <ImageBackground
+      {/* <ImageBackground
         source={{
           uri: "https://i.pinimg.com/originals/14/be/a9/14bea97986a9a3af9ef4b65842162303.jpg",
         }}
         style={styles.topImage}
         resizeMode="cover"
-      />
+      /> */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search..."
+          placeholderTextColor={"#dddddd"}
+          defaultValue={searchText}
+          onChangeText={(text) => setSearchText(text)}
+        />
+        <TouchableOpacity
+          style={styles.searchButton}
+          onPress={() => searchForSong()}
+        >
+          <Ionicons name="search-outline" size={30} color="#000000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.details}>
         <Text style={styles.title}>
           {currentTrackTitle.length > 3
@@ -281,11 +357,12 @@ const Home = () => {
             : "No Song"}
         </Text>
         <Text style={styles.timer}>
-          {currentTrackTitle.length > 3 ? TimeConvert(currentTrackTime) : ""}
+          {currentTrackTitle.length > 3 ? TimeConvert(currentTrackTime) : ""} -{" "}
+          {songPosition > 3 ? TimeConvertMil(songPosition) : ""}
         </Text>
       </View>
       <ScrollView>
-        {Songs.length > 0 &&
+        {filteredSongs.length > 0 ? (
           filteredSongs.map((track, i) => {
             return (
               <MusicListItem
@@ -297,13 +374,17 @@ const Home = () => {
                 currentTrackIndex={currentTrackIndex}
               />
             );
-          })}
+          })
+        ) : (
+          <Text style={styles.noSong}>There are no songs</Text>
+        )}
       </ScrollView>
       <View style={styles.controller}>
         <ProgressBar
           duration={currentTrackTime}
           trackId={currentTrackId}
           Playing={play}
+          songPosition={songProgress}
         />
         <View style={styles.players}>
           <PlayerButton

@@ -2,19 +2,19 @@ import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 const { width, height } = Dimensions.get("screen");
 
-const ProgressBar = ({ duration, trackId, Playing }) => {
+const ProgressBar = ({ duration, trackId, Playing, songPosition }) => {
   const [id, setId] = useState(0);
   const [timeLapsed, setTimeLapsed] = useState(0);
 
   const styles = StyleSheet.create({
     container: {
-      width: width - 10,
-      height: 7,
-      backgroundColor: "#777777",
+      width: width,
+      height: 2,
+      backgroundColor: "#fff",
     },
     innerbar: {
-      width: width / 2,
-      height: 7,
+      width: `${songPosition}%`,
+      height: 2,
       backgroundColor: "#f8c100",
     },
     circle: {
@@ -24,7 +24,7 @@ const ProgressBar = ({ duration, trackId, Playing }) => {
       height: 20,
       borderRadius: 10,
       zIndex: 2,
-      marginLeft: width / 2,
+      marginLeft: `${songPosition}%`,
       marginTop: -5,
     },
   });
@@ -33,18 +33,19 @@ const ProgressBar = ({ duration, trackId, Playing }) => {
   const timerCount = (cmd) => {
     let countInterval;
 
-    if (cmd == "countup") {
-      var i = 0;
-      // This block will be executed 100 times.
-      countInterval = setInterval(function () {
-        if (i == 200 || i > 200) clearInterval(this);
-        // else console.log("Currently at " + i++);
-      }, 1000);
-    }
+    // if (cmd == "countup") {
+    //   var i = 0;
+    //   // This block will be executed 100 times.
+    //   countInterval = setInterval(function () {
+    //     if (i == 200 || i > 200) clearInterval(this);
+    //     else console.log("Currently at " + i++);
+    //   }, 1000);
+    // }
 
-    if (cmd == "paused") {
-      clearInterval(countInterval);
-    }
+    // if (cmd == "paused") {
+    //   clearInterval(countInterval);
+    //   clearInterval(interval)
+    // }
   }; // End
 
   useEffect(() => {
@@ -67,8 +68,8 @@ const ProgressBar = ({ duration, trackId, Playing }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.circle}></View>
-      <View style={styles.innerbar}></View>
+      {/* <View style={styles.circle}></View> */}
+      {Playing && <View style={styles.innerbar}></View>}
     </View>
   );
 };
