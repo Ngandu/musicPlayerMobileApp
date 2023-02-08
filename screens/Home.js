@@ -35,11 +35,12 @@ const Home = () => {
   const [songProgress, setSongProgress] = useState(0);
   const [songPosition, setSongPosition] = useState(0);
   const [searchText, setSearchText] = useState("");
+  const [songState, setSongState] = useState("stop");
 
   const sound = React.useRef(new Audio.Sound());
 
   async function playSound(audio, i) {
-    console.log(audio);
+    // console.log(audio);
     if (Sound === null) {
       const { sound, status } = await Audio.Sound.createAsync({
         uri: audio.uri,
@@ -49,21 +50,23 @@ const Home = () => {
       //console.log("Playing Sound nothing else in here");
       await sound.playAsync();
 
-      sound.setOnPlaybackStatusUpdate(() => console.log(status.positionMilis));
+      //sound.setOnPlaybackStatusUpdate(() => console.log(status.positionMilis));
       setCurrentTrackId(audio.id);
       setCurrentTrackTitle(audio.filename);
       setCurrentTrackIndex(i);
       setCurrentTrackTime(audio.duration);
       setPlay(true);
+      setSongState("play");
     } else {
       // console.log("There is a song currently playing");
       // Check whether it's the same track as that which is playing
       // console.log("currentTrackId: ", currentTrackId);
       if (audio.id == currentTrackId) {
-        console.log("Its the same song - So unload");
+        // console.log("Its the same song - So unload");
         Sound.unloadAsync();
         setCurrentTrackId(0);
         setPlay(false);
+        setSongState("pause");
       } else {
         // console.log("Its a different song - reload and play");
         /// not the same track
@@ -83,6 +86,7 @@ const Home = () => {
         setCurrentTrackIndex(i);
         setCurrentTrackTime(audio.duration);
         setPlay(true);
+        setSongState("play");
       }
     }
   }
@@ -90,14 +94,27 @@ const Home = () => {
   // Controllers
   const playButtonPressed = async () => {
     // Check if there is a song loaded
-    console.log(play);
+    // console.log(play);
     if (play) {
-      Sound.pauseAsync();
-      setPlay(false);
+      if (songState == "play") {
+        Sound.pauseAsync();
+        setSongState("paused");
+        return;
+      } else if (songState == "paused") {
+        Sound.playAsync();
+        setSongState("play");
+        return;
+      } else {
+        Sound.pauseAsync();
+        setSongState("stop");
+        setPlay(false);
+        return;
+      }
     } else {
       // await Sound.playAsync();
-      playSound(Songs[0], 0);
+      await playSound(Songs[0], 0);
       setPlay(true);
+      setSongState("play");
     }
   };
 
@@ -109,15 +126,15 @@ const Home = () => {
       // console.log("nextIndex: ", nextIndex);
       let nextSong = Songs[nextIndex];
       setCurrentTrackIndex(nextIndex);
-      playSound(nextSong, nextIndex);
+      await playSound(nextSong, nextIndex);
     } else {
       // if a song is currently plying, this means the first song is playing
       if (play) {
-        playSound(Songs[1], 1);
+        await playSound(Songs[1], 1);
         return;
       }
       // if Playing is not on then the first song on the array should play
-      playSound(Songs[0], 0);
+      await playSound(Songs[0], 0);
     }
   };
 
@@ -373,6 +390,7 @@ const Home = () => {
                 addHeart={addHeart}
                 playthisSong={playSound}
                 currentTrackId={currentTrackId}
+                songState={songState}
               />
             );
           })
@@ -393,7 +411,7 @@ const Home = () => {
             onPress={() => previousButtonPressed()}
           />
           <PlayerButton
-            icon={play ? "pause-outline" : "play-outline"}
+            icon={songState == "play" ? "pause-outline" : "play-outline"}
             onPress={() => playButtonPressed()}
           />
           <PlayerButton

@@ -49,17 +49,17 @@ const ProgressBar = ({ duration, trackId, Playing, songPosition }) => {
   }; // End
 
   useEffect(() => {
-    console.log("progress: ", Playing);
+    // console.log("progress: ", Playing);
 
     if (Playing) {
       // Check if the song is the same
-      console.log(id, trackId);
+      // console.log(id, trackId);
       if (id !== trackId) {
-        console.log("playing new song");
+        // console.log("playing new song");
         setId(trackId);
       } else {
         timerCount("countup");
-        console.log("playing same song");
+        // console.log("playing same song");
       }
     } else {
       timerCount("paused");

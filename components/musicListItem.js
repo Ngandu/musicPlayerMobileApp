@@ -10,6 +10,7 @@ const MusicListItem = ({
   addHeart,
   playthisSong,
   currentTrackId,
+  songState,
 }) => {
   const [IsPlaying, setIsPlaying] = useState(false);
 
@@ -87,9 +88,15 @@ const MusicListItem = ({
       onPress={() => playthisSong(track, index)}
     >
       {IsPlaying ? (
-        <Ionicons name="pause-circle-outline" size={26} color="#444444" />
+        <Ionicons
+          name={
+            songState == "play" ? "pause-circle-outline" : "play-circle-outline"
+          }
+          size={26}
+          color={"#444444"}
+        />
       ) : (
-        <Ionicons name="play-circle-outline" size={26} color="#f8c100" />
+        <Ionicons name={"play-circle-outline"} size={26} color={"#f8c100"} />
       )}
 
       <View style={styles.titleSection}>
