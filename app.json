@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "music-player",
-    "slug": "music-player",
+    "name": "Rozevox",
+    "slug": "Rozevox",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -25,7 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.patrickngandu.musicplayer"
+      "package": "com.patrickngandu.rozevox"
     },
     "web": {
       "favicon": "./assets/favicon.png"
